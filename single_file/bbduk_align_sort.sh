@@ -15,13 +15,18 @@ set -o pipefail
 
 species= #no spaces in name
 ref_fasta=
+raw_fq1=
+raw_fq2=
+strain=
+adapters=
+phix=
+bbduk=
 read1= #with path if needed
 
 #Parse the fastq file for strain, verify it matches the strain entered manually 
 strain=$(basename "${read1}" | cut -d '_' -f 1)
 
 # Load modules for trimming and aligning
-module load trimmomatic/0.39
 module load bwa/0.7.17
 module load samtools/1.10
 
@@ -33,13 +38,17 @@ for d in "${arr[@]}"; do
   fi
 done
 
-# Quality trimming 
-java -jar /panfs/roc/msisoft/trimmomatic/0.39/trimmomatic.jar PE -threads 8 \
--phred33 -trimlog logs/"${strain}".trimlog -basein "${read1}" \
--baseout trimmed_fastq/"${strain}"_trimmed.fastq.gz \
-LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 TOPHRED33
+# Adapter and quality trimming using JGI BBTools data preprocessing guidelines 
+## trim adapters 
+"${bbduk}" in1="${raw_fq1}" in2="${raw_fq2}" out1="${strain}"_trim_adapt1.fq out2="${strain}"_trim_adapt2.fq ref="${adapters}" ktrim=r k=23 mink=11 hdist=1 tpe tbo
 
-# Alignment, fix mate-pair errors from alignment, sort, mark duplicates
+## contaminant (phix) filtering
+"${bbduk}" in1="${strain}"_trim_adapt1.fq in2="${strain}"_trim_adapt2.fq out1="${strain}"_unmatched1.fq out2="${strain}"_unmatched2.fq outm1="${strain}"_matched1.fq outm2="${strain}"_matched2.fq ref="${phix}" k=31 hdist=1 stats=phistats.txt
+
+## quality trimming (bbduk user guide recommends this as separate step from adapter trimming)
+"${bbduk}" in1="${strain}"_unmatched1.fq in2="${strain}"_unmatched2.fq out1="${strain}"_trimmed_1P.fq out2="${strain}"_trimmed_2P.fq qtrim=rl trimq=10
+
+# Reference alignment, fix mate-pair errors from alignment, sort, mark duplicates
 bwa mem -t 128 -R "@RG\tID:${species}_${strain}\tPL:ILLUMINA\tPM:NextSeq\tSM:${strain}" \
 "${ref_fasta}" trimmed_fastq/"${strain}"_trimmed_1P.fastq.gz \
 trimmed_fastq/"${strain}"_trimmed_2P.fastq.gz \
