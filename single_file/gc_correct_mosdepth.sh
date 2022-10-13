@@ -68,7 +68,7 @@ for b in $bam; do
   sed -i "1s/^/chr\tstart\tstop\t${strain}\n/" \
   "${strain}_${ref}_deeptools_${window}"_chrnum_mosdepth.gg.tab
 
-  mv AMS*.txt mosdepth_text/
+  mv AMS*.txt mosdepth_txt/
   mv AMS*.tab tab/
   mv AMS*.bed* mosdepth_bed/
 done
