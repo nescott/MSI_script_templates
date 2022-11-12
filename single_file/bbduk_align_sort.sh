@@ -6,7 +6,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=scot0854@umn.edu
 #SBATCH --time=2:00:00
-#SBATCH -p msismall,msilarge 
+#SBATCH -p msismall,msilarge
 #SBATCH -o %x_%u_%j.out
 #SBATCH -e %x_%u_%j.err
 
@@ -23,7 +23,7 @@ phix=/home/selmecki/shared/software/bbmap/resources/adapters.fa
 bbduk=/home/selmecki/shared/software/bbmap/bbduk.sh
 read1= #with path if needed
 
-#Parse the fastq file for strain, verify it matches the strain entered manually 
+#Parse the fastq file for strain, verify it matches the strain entered manually
 strain=$(basename "${read1}" | cut -d '_' -f 1)
 
 # Load modules for trimming and aligning
@@ -38,8 +38,8 @@ for d in "${arr[@]}"; do
   fi
 done
 
-# Adapter and quality trimming using JGI BBTools data preprocessing guidelines 
-## trim adapters 
+# Adapter and quality trimming using JGI BBTools data preprocessing guidelines
+## trim adapters
 "${bbduk}" in1="${raw_fq1}" in2="${raw_fq2}" out1="${strain}"_trim_adapt1.fq out2="${strain}"_trim_adapt2.fq ref="${adapters}" ktrim=r k=23 mink=11 hdist=1 ftm=5 tpe tbo
 
 ## contaminant (phix) filtering
@@ -57,10 +57,13 @@ trimmed_fastq/"${strain}"_trimmed_2P.fastq.gz \
 | samtools sort -l 0 -T "${species}" -@8 - \
 | samtools markdup -@8 - bam/"${strain}"_trimmed_bwa_sorted_markdup.bam
 
+rm trimmed_fastq/*_matched*.fq
+rm trimmed_fastq/*_unmatched*.fq
+rm trimmed_fastq/*_trim_adapt*.fq
+
 #reindex
 samtools index bam/"${strain}"_trimmed_bwa_sorted_markdup.bam
 
 #basic stats
 samtools flagstat bam/"${strain}"_trimmed_bwa_sorted_markdup.bam \
 > logs/"${strain}"_trimmed_bwa_sorted_markdup.stdout
-

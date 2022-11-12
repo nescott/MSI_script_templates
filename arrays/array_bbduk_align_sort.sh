@@ -71,3 +71,7 @@ samtools index bam/"${strain}"_trimmed_bwa_sorted_markdup.bam
 samtools flagstat bam/"${strain}"_trimmed_bwa_sorted_markdup.bam \
 > logs/"${strain}"_trimmed_bwa_sorted_markdup.stdout
 
+# discard extra files
+rm trimmed_fastq/*_unmatched*.fq
+rm trimmed_fastq/*_matched*.fq
+rm trimmed_fastq/*_trim_adapt*.fq
