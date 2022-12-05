@@ -40,4 +40,4 @@ END {
       if (a[i]!="")
           print i,a[i]
 }
-' samples.txt FS="/" fastq.txt > "${out_file}"
+' samples.txt FS="/" fastq.txt | tr -s ' ' | sort -k1,1 > "${out_file}"
