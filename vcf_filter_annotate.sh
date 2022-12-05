@@ -28,7 +28,9 @@ vcftools_out=  # do not include .vcf
 snpeff=/home/selmecki/shared/software/snpEff/snpEff.jar
 snpeff_config=/home/selmecki/shared/software/snpEff/snpEff.config
 snpeff_db=
-annotate_vcf=
+annotate_vcf=  # include .vcf
+snpsift=/home/selmecki/shared/software/snpEff/SnpSift.jar
+final_vcf=  # include vcf
 
 #Load modules
 module load bcftools/1.10.2
@@ -51,6 +53,16 @@ bcftools view -e "INFO/TYPE='complex'" "${raw_vcf}" \
 java -Xmx4g -jar "${snpeff}" -c "${snpeff_config}" "${snpeff_db}" \
 "${vcftools_out}.recode.vcf" >  "${annotate_vcf}"
 
+# filter by impact
+java -Xmx4g -jar "${snpsift}" filter "ANN[*].IMPACT has 'HIGH' \
+| ANN[*].IMPACT has 'MODERATE'" "${annotate_vcf}" > "${final_vcf}"
+
 #zip and index output (facilitate IGV loading)
-bgzip "${annotate_vcf}"
-bcftools index -t "${annotate_vcf}".gz
+bgzip "${final_vcf}"
+bcftools index -t "${final_vcf}".gz
+bcftools stats "${final_vcf}.gz" > ../logs/"${final_vcf}.stats"
+
+rm "${raw_vcf}"
+rm "${bcftools_out}"
+rm "${vcftools_out}.recode.vcf"
+rm "${annotate_vcf}"
