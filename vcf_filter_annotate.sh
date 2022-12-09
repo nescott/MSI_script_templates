@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem=8gb
+#SBATCH --mem=4gb
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=scot0854@umn.edu
-#SBATCH --time=2:00:00
+#SBATCH --time=1:00:00
 #SBATCH -p msilarge,msismall
 #SBATCH -o %x_%u_%j.out
 #SBATCH -e %x_%u_%j.err
@@ -55,7 +55,7 @@ java -Xmx4g -jar "${snpeff}" -c "${snpeff_config}" "${snpeff_db}" \
 
 # filter by impact
 java -Xmx4g -jar "${snpsift}" filter "ANN[*].IMPACT has 'HIGH' \
-| ANN[*].IMPACT has 'MODERATE'" "${annotate_vcf}" > "${final_vcf}"
+| ANN[*].IMPACT has 'MODERATE'| ANN[*].IMPACT has 'LOW'" "${annotate_vcf}" > "${final_vcf}"
 
 #zip and index output (facilitate IGV loading)
 bgzip "${final_vcf}"
