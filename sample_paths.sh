@@ -4,17 +4,20 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --output=%j.out
 #SBATCH --error=%j.err
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=scot0854@umn.edu
-#SBATCH -t 50
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=
+#SBATCH -t 30
 #SBATCH -p msismall,msilarge
 
-#Creates sample ID and sequencing path file
-#Output is "sample_id path/to/read1.fastq.gz path/to/read2.fastq.gz path/to/any/reads.fastq.gz"
+# Creates sample ID and sequencing path file
+# Input is a sample list (one sample ID per line, which should be in the file name of the fastq reads)
+# Output is "sample_id path/to/read1.fastq.gz path/to/read2.fastq.gz path/to/any/reads.fastq.gz"
 
 dir=/home/selmecki/shared/disaster_recovery/Sequencing_Runs/
-out_file=AMS_sequencing_paths.txt  #name for output
+in_file=
+out_file=
 
+# may need to change the grep requirements depending on file and sample names
 find $dir  -type f -name "*fastq*" | sort | grep -Eiv "RNA|SRA|MinION" \
 |tee fastq.txt | xargs basename -s ".fastq.gz" |tee basenames.txt \
 | grep -Eo "(AMS|MEC)+_?[0-9]{3,5}" | sort | uniq > samples.txt
@@ -40,4 +43,4 @@ END {
       if (a[i]!="")
           print i,a[i]
 }
-' samples.txt FS="/" fastq.txt | tr -s ' ' | sort -k1,1 > "${out_file}"
+' "${in_file}" FS="/" fastq.txt | tr -s " " | sort -k1,1 > "${out_file}"

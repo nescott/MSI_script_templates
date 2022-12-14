@@ -1,36 +1,42 @@
 #!/bin/bash
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem=20gb
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=scot0854@umn.edu
-#SBATCH --time=12:00:00
-#SBATCH -p amdsmall,amdlarge,amd512,amd2tb,small,large,max
+#SBATCH --mem=10gb
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=
+#SBATCH --time=48:00:00
+#SBATCH -p msismall,msilarge
 #SBATCH -o %x_%u_%A_%a.out
 #SBATCH -e %x_%u_%A_%a.err
-#SBATCH --array=1-8
+#SBATCH --array=
 
-# call variants for all samples in a population using freebayes, subsetting by region
+# call variants for all samples in a population using freebayes, subsetting by region (chromosome)
+# array size == number of chromosomes/contigs in reference file
+# time needed depends on number of samples (C. albicans 100 samples required >36 hours)
+# input files: a list of bam files (with path if needed) and a list of regions
+# output: multi-sample vcf file per each region, file name is the region name (may want to change this) 
+# NOTE: freebayes options are -C (number of supporting reads), -F (min alt allele frequency for calling)
+#  and -p (ploidy) - change as needed, should probably change these to vars at top of script
 set -ue
 set -o pipefail
 
-species=Clusitaniae 
-ref=fda
-ref_fasta=/home/selmecki/shared/Reference_Genomes/C_lusitaniae/ASM1463611v1/GCA_014636115.1_ASM1463611v1_genomic.fna
-line=${SLURM_ARRAY_TASK_ID} 
-bam_list=bam.files
+line=${SLURM_ARRAY_TASK_ID}
 region_list=regions.txt
+ref_fasta=   # FREEBAYES REQUIRES UNZIPPED REF so annoying
+bam_list=bam.files
+species=   # no spaces
+ref=  # abbreviation for reference genome
 
 chr=$(awk -v val="$line" 'NR == val { print $0}' $region_list)
 
-#Load modules 
+#Load modules
 module load samtools/1.10
 module load freebayes/20180409
 
 freebayes -f "${ref_fasta}" \
   -C 10 \
   -F 0.4 \
-  -p 1 \
+  -p 2 \
   -r "${chr}" \
   -L "${bam_list}" \
-  -v "${species}_${ref}_${chr:0:15}.vcf"
+  -v "chr_vcf/${species}_${ref}_${chr}.vcf"

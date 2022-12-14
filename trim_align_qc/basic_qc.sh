@@ -3,8 +3,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=4gb
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=scot0854@umn.edu
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=
 #SBATCH --time=8:00:00
 #SBATCH -p msismall,msilarge
 #SBATCH -o %x_%u_%j.out
@@ -12,14 +12,12 @@
 
 set -ue
 set -o pipefail
-unset DISPLAY
+unset DISPLAY # qualimap won't work on cluster without this
 
-fastq_dir=
-bam_dir=
-logs_dir=
-temp_dir=/scratch.global/scot0854  #scratch directory
-out_dir=
-file_name="$(date +%F)_"
+bam_dir=bam
+logs_dir=logs
+temp_dir= #scratch directory previously created during trimming
+file_name="$(date +%F)_qc" 
 
 # Use local modules
 module use /home/selmecki/scot0854/modulefiles.local
@@ -30,7 +28,7 @@ module load qualimap/20221111
 module load multiqc/20221111
 
 # raw fastq file qc
-find "$fastq_dir" -name "*trimmed_*P.fq" -exec fastqc -o -t 8 "$temp_dir" {} \;
+find "$temp_dir" -name "*trimmed_*P.fq" -exec fastqc  -t 8 "$temp_dir" {} \;
 
 # bam qc
 find "$bam_dir" -name "*.bam" \
@@ -38,4 +36,4 @@ find "$bam_dir" -name "*.bam" \
 
 # multiqc
 
-multiqc "$temp_dir" "$logs_dir" -o "$out_dir" -n "$file_name"
+multiqc "${temp_dir}" "${logs_dir}" "${bam_dir}" -o logs -n "$file_name"
