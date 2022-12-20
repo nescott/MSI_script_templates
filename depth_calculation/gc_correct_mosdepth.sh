@@ -16,16 +16,22 @@ set -o pipefail
 # local modules
 
 module use "$HOME"/modulefiles.local
-module load deeptools/20221013 # computes and corrects GC bias
 # Requires effective genome size and reference genome in 2bit format
+module load deeptools/20221013 # computes and corrects GC bias
 module load mosdepth/20221013 # Calculates depth per tiled window
 
+# how to get effective genome size:
+# ~/bin/faCount $ref.fna.gz -summary
+# how to get 2bit file format for deeptools commands:
+#  ~/bin/faToTwoBit GCA_003675555.2_ASM367555v2_genomic.fna.gz
+#  GCA_00367555.2bit
+
 window=2500  #bigger bp window smooths visualization
-ref=fda  #short ID
-in_dir=../bam
+ref=  #short ID
+in_dir=../bam  # make depth dir  and run relative to bams b/c of many files
 bam=$(find $in_dir -mindepth 1 -maxdepth 1 -type f -name "AMS5200*.bam")
-genome_size=12152819
-ref2bit="$HOME"/faToTwoBit/GCA01436115.1.2bit
+genome_size=
+ref2bit=  # path to 2bit file (see above)
 
 # output dirs
 arr=("gc_corrected_bams" "mosdepth_txt" "mosdepth_bed" "tab")
