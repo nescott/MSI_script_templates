@@ -2,7 +2,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
-#SBATCH --mem=20gb
+#SBATCH --mem=260gb
 #SBATCH --time=1:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=scot0854@umn.edu
