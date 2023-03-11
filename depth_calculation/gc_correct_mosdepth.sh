@@ -61,11 +61,8 @@ zcat "${strain}_${ref}_deeptools_${window}".regions.bed.gz \
 | awk -v val="$mean" 'BEGIN{OFS="\t"} {print $1,$2,$3,$4/val}' \
 > "${strain}_${ref}_deeptools_${window}"_mosdepth.gg.tab
 
-sed -f "sed_${ref}_chr" < "${strain}_${ref}_deeptools_${window}"_mosdepth.gg.tab \
-> "${strain}_${ref}_deeptools_${window}"_chrnum_mosdepth.gg.tab
-
 sed -i "1s/^/chr\tstart\tstop\t${strain}\n/" \
-"${strain}_${ref}_deeptools_${window}"_chrnum_mosdepth.gg.tab
+"${strain}_${ref}_deeptools_${window}"_mosdepth.gg.tab
 
 mv ./*.txt mosdepth_txt
 mv ./*.tab tab
