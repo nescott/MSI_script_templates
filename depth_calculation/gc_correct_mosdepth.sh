@@ -2,10 +2,10 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=10gb
+#SBATCH --mem=4gb
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=scot0854@umn.edu
-#SBATCH --time=2:00:00
+#SBATCH --time=1:00:00
 #SBATCH -p msismall,msilarge
 #SBATCH -o %x_%u_%j.out
 #SBATCH -e %x_%u_%j.err
@@ -22,11 +22,11 @@ module load deeptools/20221013 # computes and corrects GC bias
 module load mosdepth/20221013 # Calculates depth per tiled window
 
 line=${SLURM_ARRAY_TASK_ID}
-window=500  # bigger bp window smooths visualization
-ref=sc5314  # short ID
+window=2000  # bigger bp window smooths visualization
+ref=  # short ID
 bam_file= # to iterate over as array
-genome_size=14320608  # see above to get this number
-ref2bit="$HOME"/bin/faToTwoBit/C_albicans_SC5314_version_A21-s02-m09-r08_chromosomes.2bit
+genome_size=  # see above to get this number
+ref2bit="$HOME"/bin/faToTwoBit/
 
 # output dirs
 arr=("gc_corrected_bams" "mosdepth_txt" "mosdepth_bed" "tab")
