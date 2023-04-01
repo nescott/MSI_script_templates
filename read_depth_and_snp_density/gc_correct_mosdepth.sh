@@ -59,6 +59,6 @@ zcat "${strain}_${ref}_deeptools_${window}".regions.bed.gz \
 sed -i "1s/^/chr\tstart\tstop\t${strain}\n/" \
 "${strain}_${ref}_deeptools_${window}"_mosdepth.gg.tab
 
-mv ./*.txt mosdepth_txt
-mv ./*.tab tab
-mv ./*.bed* mosdepth_bed
+mv ./"*${strain}*".txt mosdepth_txt
+mv ./"*${strain}*"*.tab tab
+mv ./"*${strain}*"*.bed* mosdepth_bed
