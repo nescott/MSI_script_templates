@@ -24,7 +24,7 @@ find $dir  -type f -name "*fastq*" | sort | grep -Eiv "RNA|SRA|MinION" \
 
 awk '
 {
-    if (substr($NF,1,4)=="_")
+    if (substr($NF,1,4)=="AMS_")
         str1=substr($NF,1,8)
     else if (substr($NF,1,3)=="MEC")
         str1=substr($NF,1,6)
