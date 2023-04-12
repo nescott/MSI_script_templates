@@ -36,6 +36,6 @@ samtools mpileup -f "${fasta}" "${snp_bam}" | awk '{print $1, $2, $3, $4, $5}' >
 
 python3 berman_count_snps_v5.py "${snp_strain}".pileup > "${snp_strain}"_"${ref}"_putative_SNPs.txt
 
-sed -i "1s/^/chr\tpos\tref\tA\tT\tC\tG\n/" "${snp_strain}"_"${ref}"_putative_SNPs.txt
+sed -i "1s/^/chr\tpos\tref\tA\tT\tG\tC\n/" "${snp_strain}"_"${ref}"_putative_SNPs.txt
 
 rm "${snp_strain}".pileup
