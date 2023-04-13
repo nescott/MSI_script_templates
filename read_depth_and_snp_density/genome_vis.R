@@ -36,7 +36,7 @@ ploidy <- 2 # for data wrangling and proper plotting
 ## plotting variables
 chr_ids <- c("Chr1", "Chr2", "Chr3", "Chr4", "Chr5", "Chr6", "Chr7", "ChrR") # x-axis labels
 y_axis_labels <- c(1,2,3,4)  # alter as needed when changing the y-max
-inter_chr_spacing <- 150000 # size of blank spaces between chrs 
+inter_chr_spacing <- 150000 # size of blank spaces between chrs
 snp_low <- "white"  # snp LOH colors, plot function uses 2-color gradient scale
 snp_high <- "black"  # snp LOH colors
 copy_number <- "steelblue4"  # copy number color
@@ -45,12 +45,12 @@ chrom_outline_color <- "gray15"  # color of chromosome outlines
 chrom_line_width <- 0.2  # line width of chromosome outlines
 
 ## output variables
-save_dir <- "plots/" # path with trailing slash, or just "" to save in same folder 
-ref <- "SC5314_a21" # short label for filename 
+save_dir <- "plots/" # path with trailing slash, or just "" to save in same folder
+ref <- "SC5314_a21" # short label for filename
 
 ## ---------------------------
 ## Base R doesn't have a mode calculation
-# nice to compare this to median but not essential 
+# nice to compare this to median but not essential
 # (this function is used to make chr_mode column below, delete if necessary)
 Modes <- function(x) {
   ux <- unique(x)
@@ -72,7 +72,7 @@ chr_median <- genome_raw %>%  # checking each chromosome for outliers relative t
   summarise(chr_mode = Modes(depth), chr_med = median(depth))  # can also manually compare mode and median
 
 subset_chr_median <- chr_median %>%  # moderate filtering for aneuploidy
-  filter(chr_med <= raw_genome_median *1.1 & chr_med >= raw_genome_median * 0.9)
+  filter(chr_med <= raw_genome_median *1.15 & chr_med >= raw_genome_median * 0.85)
 
 genome_median <- median(subset_chr_median$chr_med)  # filtered median used to calculate relative depth
 
@@ -100,7 +100,7 @@ genome_depth <- genome_raw %>%
 genome_snp <- read.table(snp_file, header = TRUE)
 genome_snp <- genome_snp %>%
   filter(chr != mito) %>%
-  mutate(reads=rowSums(pick(A,T,C,G))) %>%
+  mutate(reads=rowSums(pick(A,T,G,C))) %>%
   mutate(across(c(A,T,C,G), ~ .x /reads, .names = "{.col}_freq"))
 
 genome_snp <- genome_snp %>%
@@ -133,7 +133,7 @@ p <- ggplot(genome_depth) +
   geom_segment(aes(x = plot_pos, y = 0, color = snp_count, xend = plot_pos, yend = Inf)) +
   geom_segment(aes(x = plot_pos, y = ifelse(copy_number <= ploidy*ploidy_multiplier, copy_number, Inf),
                    xend = plot_pos, yend = ploidy), alpha = 0.9, color = copy_number) +
-  geom_rect(data=chroms, aes(group=index, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), 
+  geom_rect(data=chroms, aes(group=index, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax),
             linewidth = chrom_line_width, fill = NA, colour = chrom_outline_color, linejoin = "round", inherit.aes = FALSE) +
   xlab(sample_id) +
   scale_x_continuous(expand = c(0, 0), breaks = ticks, labels = chr_ids) +
@@ -142,7 +142,7 @@ p <- ggplot(genome_depth) +
   theme(plot.title = element_text(size = 12, hjust = 0.5),
         axis.ticks = element_line(color = NA),
         axis.line = element_blank(),
-        axis.text = element_text(size = 12)) 
+        axis.text = element_text(size = 12))
 ggsave(sprintf("%s%s_%s_%s_%sbp.jpg", save_dir, Sys.Date(), sample_id, ref, window),
        p, width = 18, height = 1.7, units = "in")
 ## ---------------------------
