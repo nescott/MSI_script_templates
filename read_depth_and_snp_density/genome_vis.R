@@ -31,22 +31,22 @@ mito <- "Ca19-mtDNA" #scaffold ID - will use for subsetting
 
 ## data-wrangling variables
 window <- 5000 # size of window used for rolling mean and snp density
-ploidy <- 2 # for data wrangling and proper plotting
+ploidy <- 2 # for proper plotting of y-axis
 
 ## plotting variables
-chr_ids <- c("Chr1", "Chr2", "Chr3", "Chr4", "Chr5", "Chr6", "Chr7", "ChrR") # x-axis labels
-y_axis_labels <- c(1,2,3,4)  # alter as needed when changing the y-max
-inter_chr_spacing <- 150000 # size of blank spaces between chrs
+chr_ids <- c("Chr1", "Chr2", "Chr3", "Chr4", "Chr5", "Chr6", "Chr7", "ChrR") # manual x-axis labels overwrite input scaffold names in final plot
+y_axis_labels <- c(1,2,3,4)  # manual y-axis labels for now, to remove "0" from axis if wanted
+inter_chr_spacing <- 150000 # size of space between chrs
 snp_low <- "white"  # snp LOH colors, plot function uses 2-color gradient scale
-snp_high <- "black"  # snp LOH colors
+snp_high <- "black"  # snp LOH colors, plot function uses 2-color gradient scale
 copy_number <- "steelblue4"  # copy number color
-ploidy_multiplier <- 2  # this number times ploidy sets the max-y scale
+ploidy_multiplier <- 2  # this number multiplied by ploidy sets the max-y scale
 chrom_outline_color <- "gray15"  # color of chromosome outlines
 chrom_line_width <- 0.2  # line width of chromosome outlines
 
 ## output variables
 save_dir <- "plots/" # path with trailing slash, or just "" to save in same folder
-ref <- "SC5314_a21" # short label for filename
+ref <- "SC5314_a21" # short label for generating file name 
 
 ## ---------------------------
 ## Base R doesn't have a mode calculation
@@ -65,13 +65,13 @@ genome_raw <- genome_raw %>%
   filter(chr != mito)
 genome_raw$rolling_mean <- roll_mean(genome_raw$depth, window)[seq_len(length(genome_raw$chr))]
 
-raw_genome_median <- median(genome_raw$depth) #across all chromosomes, may need correcting
+raw_genome_median <- median(genome_raw$depth) #includes all chromosomes, may need correcting
 
 chr_median <- genome_raw %>%  # checking each chromosome for outliers relative to genome
   group_by(chr) %>%
-  summarise(chr_mode = Modes(depth), chr_med = median(depth))  # can also manually compare mode and median
+  summarise(chr_mode = Modes(depth), chr_med = median(depth))  # can manually compare mode and median if questioning median
 
-subset_chr_median <- chr_median %>%  # moderate filtering for aneuploidy
+subset_chr_median <- chr_median %>%  # moderate filtering to avoid aneuploidy skew of "normal" genome depth
   filter(chr_med <= raw_genome_median *1.15 & chr_med >= raw_genome_median * 0.85)
 
 genome_median <- median(subset_chr_median$chr_med)  # filtered median used to calculate relative depth
@@ -84,19 +84,19 @@ genome_window <- genome_window %>%
   group_by(index) %>%
   mutate(chr_length = max(position))
 
-chrs <- as.vector(unique(genome_window$chr_length))
+chrs <- as.vector(unique(genome_window$chr_length))  # for plotting
 chr_plot <- c()
-for(i in 1:length(chrs)){chr_plot[i] <- sum(chrs[1:i-1])}
+for(i in 1:length(chrs)){chr_plot[i] <- sum(chrs[1:i-1])}  # plotting
 
 genome_depth <- genome_raw %>%
   group_by(chr, index=consecutive_id(chr)) %>%
   filter(pos %in% genome_window$position) %>%
   mutate(relative_depth = rolling_mean/genome_median) %>%
   mutate(copy_number= relative_depth * ploidy) %>%
-  mutate(chr_sums=chr_plot[index]) %>%
-  mutate(plot_pos=ifelse(index==1, pos, (pos+chr_sums+(inter_chr_spacing*(index-1)))))
+  mutate(chr_sums=chr_plot[index]) %>%  # for proper x-axis plotting
+  mutate(plot_pos=ifelse(index==1, pos, (pos+chr_sums+(inter_chr_spacing*(index-1))))) # for proper x-axis plotting
 ## ---------------------------
-## SNP freq calcs (uses copy number data)
+## SNP freq calcs (pulls in position data from genome_depth dataframe)
 genome_snp <- read.table(snp_file, header = TRUE)
 genome_snp <- genome_snp %>%
   filter(chr != mito) %>%
@@ -107,7 +107,7 @@ genome_snp <- genome_snp %>%
   mutate(snp_bin=(pos %/% window) * window +1) %>%
   left_join(genome_depth, by=c("chr","snp_bin"="pos"))
 
-gad <- genome_snp %>%
+gaf <- genome_snp %>%  # sets a limit for allele frequency for heterozygosity and sums those within limit, per bin
   group_by(chr, snp_bin) %>%
   summarize(snp_count = sum((A_freq >= (1/copy_number)*0.5 & A_freq <=(1-(1/copy_number)*0.5)) |
                               (T_freq >= (1/copy_number)*0.5 & T_freq <=(1-(1/copy_number)*0.5)) |
@@ -116,11 +116,11 @@ gad <- genome_snp %>%
 )
 )
 ## ---------------------------
-## final version of joined copy number, snps, and plotting positions per window
+## final dataframe of joined copy number, snps, and plotting positions per window
 genome_depth <- genome_depth %>%
-  left_join(gad, by=c("chr", "pos"="snp_bin"))
+  left_join(gaf, by=c("chr", "pos"="snp_bin"))
 ## ---------------------------
-## chromosome outlines and label tick locations to add to final plot
+## chromosome outlines and tick locations to add to final plot (tick marks are for Chr ID)
 chroms <- genome_depth %>%
 group_by(index) %>%
 summarise(xmin=min(plot_pos), xmax=max(plot_pos), ymin=0, ymax=Inf)
@@ -135,7 +135,7 @@ p <- ggplot(genome_depth) +
                    xend = plot_pos, yend = ploidy), alpha = 0.9, color = copy_number) +
   geom_rect(data=chroms, aes(group=index, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax),
             linewidth = chrom_line_width, fill = NA, colour = chrom_outline_color, linejoin = "round", inherit.aes = FALSE) +
-  xlab(sample_id) +
+  ylab(sample_id) +
   scale_x_continuous(expand = c(0, 0), breaks = ticks, labels = chr_ids) +
   scale_y_continuous(name = NULL, limits = c(0, ploidy*ploidy_multiplier), breaks = y_axis_labels) +
   theme_classic() +
@@ -143,6 +143,8 @@ p <- ggplot(genome_depth) +
         axis.ticks = element_line(color = NA),
         axis.line = element_blank(),
         axis.text = element_text(size = 12))
+## ---------------------------
+## save plot as jpg. Height to width ratio is eyeballed for now
 ggsave(sprintf("%s%s_%s_%s_%sbp.jpg", save_dir, Sys.Date(), sample_id, ref, window),
        p, width = 18, height = 1.7, units = "in")
 ## ---------------------------
