@@ -1,5 +1,5 @@
 ## ---------------------------
-## Script name: genome_viz.R
+## Script name: genome_vis.R
 ##
 ## Purpose of script: Calculate relative depth and SNP density for a given sample,
 ## and then plot a genome-scale view.
@@ -15,7 +15,7 @@
 ## Inputs are tab-delim files from samtools depth and samtools mpileup, with headers.
 ## This script uses those headers, so change carefully.
 ## For samtools depth, recommend using bam files that have been corrected for gc bias (optional, reduces copy number noise).
-## Script order is gc_correct.sh -> ymap_prep.sh (uses berman_count_snps_v5.py) -> genome_viz.R
+## Script order is gc_correct.sh -> ymap_prep.sh (uses berman_count_snps_v5.py) -> genome_vis.R
 ## ---------------------------
 ## load packages
 library(RcppRoll)
