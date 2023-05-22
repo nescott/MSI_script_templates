@@ -24,7 +24,9 @@ fasta=/home/selmecki/shared/disaster_recovery/Reference_Genomes/SC5314_A21/C_alb
 
 # get rid of big intermediate file including if slurm script fails before finishing
 function finish {
-  rm alleles/"${snp_strain}".pileup
+  if [ -e alleles/"${snp_strain}".pileup ]; then
+    rm alleles/"${snp_strain}".pileup
+  fi
 }
 trap finish EXIT
 
@@ -53,7 +55,7 @@ fi
 
 # if the snp strain and depth strain don't match (meaning the input files were
 # sorted differently), then exit with error
-[[ "$depth_strain" != "$snp_strain" ]] && { >&2 echo "Depth and strain IDs don't match"; exit 1; }
+[[ "$depth_strain" != "$snp_strain" ]] && { >&2 echo "Depth and snp IDs don't match"; exit 1; }
 
 # read depth per position
 samtools depth -aa -o depth/"${depth_strain}"_"${ref}"_gc_corrected_depth.txt "${depth_bam}"
