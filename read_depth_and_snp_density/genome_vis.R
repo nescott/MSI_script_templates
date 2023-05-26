@@ -101,6 +101,7 @@ genome_window <- genome_raw %>%
 # more plotting stuff
 genome_window <- genome_window %>%
   group_by(index) %>%
+  arrange(index) %>%
   mutate(chr_length = max(position))
 
 # for plotting
@@ -156,7 +157,8 @@ chroms <- genome_depth %>%
   summarise(xmin=min(plot_pos), xmax=max(plot_pos), ymin=0, ymax=Inf)
 
 # tick marks to center chromosome ID label
-ticks <- tapply(genome_depth$plot_pos, genome_depth$index, quantile, probs = 0.5)
+ticks <- tapply(genome_depth$plot_pos, genome_depth$index, quantile, probs =
+                0.5, na.remove = TRUE)
 
 ## ---------------------------
 # plot linear genome
