@@ -63,7 +63,7 @@ java -Xmx4g -jar "${snpsift}" filter "ANN[*].IMPACT has 'HIGH' \
 # subset annotated (but not snpsift filtered) to just SNPs
 # and output tab-delimited file for use in R MCA script for preliminary clustering
 bcftools view -e 'GT="mis"' "${annotate_vcf}" \
-| bcftools view -e 'TYPE!="indel"' \
+| bcftools view -e 'TYPE="indel"' \
 | bcftools query -H -f '%CHROM\t%POS[\t%GT]\n' > "${genotype_table}"
 
 # fix header of genotype table
