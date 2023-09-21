@@ -49,7 +49,7 @@ bcftools view -S samples.txt "${raw_vcf}" > "${sorted_vcf}"
 bcftools view -e "INFO/TYPE='complex'" "${sorted_vcf}" \
 | bcftools view -e "INFO/AC=${allele_num}" \
 | bcftools view -i \
-"INFO/MQM>=40 && INFO/SAR>=1 && INFO/SAP>0 && INFO/RPL>1 && INFO/RPR>1" \
+"INFO/MQM>=40 & INFO/SAR>=1 & INFO/SAP>0 & INFO/RPL>1 & INFO/RPR>1" \
  -o "${bcftools_out}"
 
 # annotate using snpeff with manually built database
