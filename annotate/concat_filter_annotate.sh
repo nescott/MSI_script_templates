@@ -18,11 +18,21 @@
 
 set -ue
 set -o pipefail
+# clean up intermediates
+function finish {
+  rm "${raw_vcf}"
+  rm "${sorted_vcf}"
+  rm "${bcftools_out}"
+  rm samples.txt
+  rm chr_files.txt
+}
 
+trap finish EXIT
+
+ploidy=
 chr_dir=chr_vcf # location of vcf files to combine
 raw_vcf=  # name for unfiltered vcf, include .vcf
 sorted_vcf= # name for sorted, contatenated vcf, include .vcf
-allele_num=20 # number of samples in vcf multiplied ploidy of organism
 bcftools_out=  # intermediate vcf file, include .vcf
 snpeff=/home/selmecki/shared/software/snpEff/snpEff.jar
 snpeff_config=/home/selmecki/shared/software/snpEff/snpEff.config
@@ -44,7 +54,9 @@ bcftools concat -f chr_files.txt -o "${raw_vcf}"
 bcftools query -l "${raw_vcf}" | sort > samples.txt
 bcftools view -S samples.txt "${raw_vcf}" > "${sorted_vcf}"
 
-# view -e option excludes (here is complex variants and fixed SNPs) 
+allele_num=$((ploidy * $(wc -l < samples.txt)))
+
+# view -e option excludes (here is complex variants and fixed SNPs)
 # view -i option includes (mapping quality at least 40, alt reads forward and reverse, reads on both sides of alt allele)
 bcftools view -e "INFO/TYPE='complex'" "${sorted_vcf}" \
 | bcftools view -e "INFO/AC=${allele_num}" \
@@ -78,8 +90,3 @@ bcftools index -t "${annotate_vcf}".gz
 bgzip "${final_vcf}"
 bcftools index -t "${final_vcf}".gz
 bcftools stats "${final_vcf}.gz" > ../logs/"${final_vcf}.stats"
-
-# remove intermediate files
-rm "${raw_vcf}"
-rm "${sorted_vcf}"
-rm "${bcftools_out}"
