@@ -18,6 +18,7 @@
 
 set -ue
 set -o pipefail
+
 # clean up intermediates
 function finish {
   rm "${raw_vcf}"
@@ -29,7 +30,6 @@ function finish {
 
 trap finish EXIT
 
-ploidy=
 chr_dir=chr_vcf # location of vcf files to combine
 raw_vcf=  # name for unfiltered vcf, include .vcf
 sorted_vcf= # name for sorted, contatenated vcf, include .vcf
@@ -54,12 +54,7 @@ bcftools concat -f chr_files.txt -o "${raw_vcf}"
 bcftools query -l "${raw_vcf}" | sort > samples.txt
 bcftools view -S samples.txt "${raw_vcf}" > "${sorted_vcf}"
 
-allele_num=$((ploidy * $(wc -l < samples.txt)))
-
-# view -e option excludes (here is complex variants and fixed SNPs)
-# view -i option includes (mapping quality at least 40, alt reads forward and reverse, reads on both sides of alt allele)
 bcftools view -e "INFO/TYPE='complex'" "${sorted_vcf}" \
-| bcftools view -e "INFO/AC=${allele_num}" \
 | bcftools view -i \
 "INFO/MQM>=40 & INFO/SAR>=1 & INFO/SAP>0 & INFO/RPL>1 & INFO/RPR>1" \
  -o "${bcftools_out}"
@@ -89,4 +84,3 @@ bgzip "${annotate_vcf}"
 bcftools index -t "${annotate_vcf}".gz
 bgzip "${final_vcf}"
 bcftools index -t "${final_vcf}".gz
-bcftools stats "${final_vcf}.gz" > ../logs/"${final_vcf}.stats"
