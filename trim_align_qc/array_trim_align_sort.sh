@@ -17,8 +17,9 @@
 set -ue
 set -o pipefail
 
-species=  #no spaces in name
 sample_file=  #tab delimited sampleID read1 read2
+species=  #no spaces in name
+instrument=
 ref_fasta=  #include path; indices should be same directory
 line=${SLURM_ARRAY_TASK_ID}
 
@@ -46,7 +47,7 @@ java -jar /panfs/roc/msisoft/trimmomatic/0.39/trimmomatic.jar PE -threads 8 \
  SLIDINGWINDOW:4:15 MINLEN:36 TOPHRED33
 
 # Alignment, fix mate-pair errors from alignment, sort, mark duplicates
-bwa mem -t 8 -R "@RG\tID:${species}_${strain}\tPL:ILLUMINA\tPM:NextSeq\tSM:${strain}" \
+bwa mem -t 8 -R "@RG\tID:${species}_${strain}\tPL:ILLUMINA\tPM:${instrument}\tSM:${strain}" \
 ${ref_fasta} trimmed_fastq/"${strain}"_trimmed_1P.fastq.gz trimmed_fastq/"${strain}"_trimmed_2P.fastq.gz \
 | samtools fixmate -m - - \
 | samtools sort -l 0 -T ${species} -@8 - \

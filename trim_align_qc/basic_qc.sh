@@ -7,8 +7,8 @@
 #SBATCH --mail-user=
 #SBATCH --time=8:00:00
 #SBATCH -p msismall,msilarge
-#SBATCH -o %x_%u_%j.out
-#SBATCH -e %x_%u_%j.err
+#SBATCH -o %j.out
+#SBATCH -e %j.err
 
 set -ue
 set -o pipefail

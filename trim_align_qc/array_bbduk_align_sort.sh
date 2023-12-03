@@ -24,6 +24,7 @@ sample_file=
 # make a global scratch directory with your x500 id, then a relevant subdirectory
 tempdir=  # with trailing slash
 species=  # no spaces in name
+instrument=NextSeq
 ref_fasta=  # can be zipped or unzipped, must be indexed
 
 # Read sample file line corresponding to array task ID and get variables
@@ -71,11 +72,11 @@ qtrim=rl trimq=10
 
 # Reference alignment, fix mate-pair errors from alignment, sort, mark duplicates
 # Including sample information to ensure unique read groups if freebayes is used
-bwa mem -t 8 -R "@RG\tID:${species}_${strain}\tPL:ILLUMINA\tPM:NextSeq\tSM:${strain}" \
+bwa mem -t 8 -R "@RG\tID:${species}_${strain}\tPL:ILLUMINA\tPM:${instrument}\tSM:${strain}" \
 "${ref_fasta}" "${tempdir}"trimmed_fastq/"${strain}"_trimmed_1P.fq \
 "${tempdir}"trimmed_fastq/"${strain}"_trimmed_2P.fq \
 | samtools fixmate -m - - \
-| samtools sort -l 0 -T "${species}" -@8 - \
+| samtools sort -l 0 -T "${strain}" -@8 - \
 | samtools markdup -@8 - bam/"${strain}"_trimmed_bwa_sorted_markdup.bam
 
 # reindex
