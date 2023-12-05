@@ -50,7 +50,7 @@ java -jar /panfs/roc/msisoft/trimmomatic/0.39/trimmomatic.jar PE -threads 8 \
 bwa mem -t 8 -R "@RG\tID:${species}_${strain}\tPL:ILLUMINA\tPM:${instrument}\tSM:${strain}" \
 ${ref_fasta} trimmed_fastq/"${strain}"_trimmed_1P.fastq.gz trimmed_fastq/"${strain}"_trimmed_2P.fastq.gz \
 | samtools fixmate -m - - \
-| samtools sort -l 0 -T ${species} -@8 - \
+| samtools sort -l 0 -T ${strain} -@8 - \
 | samtools markdup -@8 - bam/"${strain}"_trimmed_bwa_sorted_markdup.bam
 
 # Reindex

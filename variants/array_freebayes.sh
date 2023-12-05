@@ -21,7 +21,7 @@ set -ue
 set -o pipefail
 
 line=${SLURM_ARRAY_TASK_ID}
-region_list=regions.txt
+region_list=
 ref_fasta=   # FREEBAYES REQUIRES UNZIPPED REF so annoying
 bam_list=bam.files
 species=   # no spaces
