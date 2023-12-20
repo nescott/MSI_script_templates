@@ -1,10 +1,8 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
 #SBATCH --output=%j.out
 #SBATCH --error=%j.err
-#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-type=FAIL
 #SBATCH --mail-user=
 #SBATCH -t 30
 #SBATCH -p msismall,msilarge

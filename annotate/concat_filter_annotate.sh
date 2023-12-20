@@ -1,13 +1,12 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
 #SBATCH --mem=4gb
-#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-type=FAIL
 #SBATCH --mail-user=
 #SBATCH --time=1:00:00
 #SBATCH -p msilarge,msismall
-#SBATCH -o %x_%u_%j.out
-#SBATCH -e %x_%u_%j.err
+#SBATCH -o %j.out
+#SBATCH -e %j.err
 
 # Concatenate chromosome vcfs into genome-wide vcf from Freebayes variant calling
 # Bcftools Filter: remove complex variants, remove fixed variants, mapping quality >40,
