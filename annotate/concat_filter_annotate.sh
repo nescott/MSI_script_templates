@@ -70,11 +70,11 @@ java -Xmx4g -jar "${snpsift}" filter "ANN[*].IMPACT has 'HIGH' \
 # output tab-delimited file for use in R MCA script for clustering
 tr "\n" "\t" < samples.txt > "${genotypes_table}"
 sed -i -e '$a\' "${genotypes_table}"
-sed '1s/^/CHROM\tPOS\t/' "${genotypes_table}"
+sed -i '1s/^/CHROM\tPOS\t/' "${genotypes_table}"
 
 bcftools view -e 'GT="mis"' "${annotate_vcf}" \
     | bcftools view -m2 -M2 -v snps \
-    | bcftools query -f '%CHROM\t%POS[\t%GT]\n' >> "${genotype_table}"
+    | bcftools query -f '%CHROM\t%POS[\t%GT]\n' >> "${genotypes_table}"
 
 # zip and index output (facilitate IGV loading)
 # save annotated vcf for additional clustering scripts
