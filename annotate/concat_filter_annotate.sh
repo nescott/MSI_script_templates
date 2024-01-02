@@ -69,8 +69,8 @@ java -Xmx4g -jar "${snpsift}" filter "ANN[*].IMPACT has 'HIGH' \
 # subset annotated to just SNPs
 # output tab-delimited file for use in R MCA script for clustering
 tr "\n" "\t" < samples.txt > "${genotypes_table}"
-sed -i -e '$\a' "${genotypes_table}"
-sed '1s/CHROM\tPOS\t/' "${genotypes_table}"
+sed -i -e '$a\' "${genotypes_table}"
+sed '1s/^/CHROM\tPOS\t/' "${genotypes_table}"
 
 bcftools view -e 'GT="mis"' "${annotate_vcf}" \
     | bcftools view -m2 -M2 -v snps \
