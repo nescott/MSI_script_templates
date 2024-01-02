@@ -39,7 +39,7 @@ snpeff_db=  # must be in snpeff.config file and must be name of directory in snp
 annotate_vcf= # another intermediate vcf file, include .vcf
 snpsift=/home/selmecki/shared/software/snpEff/SnpSift.jar
 final_vcf=  # fully annotated and filtered output, include vcf
-genotype_table=  # tab delimited table for use with R scripts (MCA using FactoMineR)
+genotypes_table=  # tab delimited table for use with R scripts (MCA using FactoMineR)
 
 #Load modules
 module load bcftools/1.10.2
@@ -66,16 +66,15 @@ java -Xmx4g -jar "${snpeff}" -c "${snpeff_config}" "${snpeff_db}" \
 java -Xmx4g -jar "${snpsift}" filter "ANN[*].IMPACT has 'HIGH' \
 | ANN[*].IMPACT has 'MODERATE' | ANN[*].IMPACT has 'LOW' " "${annotate_vcf}" > "${final_vcf}"
 
-# subset annotated (but not snpsift filtered) to just SNPs
-# and output tab-delimited file for use in R MCA script for preliminary clustering
-bcftools view -e 'GT="mis"' "${annotate_vcf}" \
-| bcftools view -m2 -M2 -v snps
-| bcftools query -H -f '%CHROM\t%POS[\t%GT]\n' > "${genotype_table}"
+# subset annotated to just SNPs
+# output tab-delimited file for use in R MCA script for clustering
+tr "\n" "\t" < samples.txt > "${genotypes_table}"
+sed -i -e '$\a' "${genotypes_table}"
+sed '1s/CHROM\tPOS\t/' "${genotypes_table}"
 
-# fix header of genotype table
-sed -i -e '1s;\[[0-9]\{1,3\}\];;g' \
-    -e '1s/^# //' \
-    -e '1s/:GT//g' "${genotype_table}"
+bcftools view -e 'GT="mis"' "${annotate_vcf}" \
+    | bcftools view -m2 -M2 -v snps \
+    | bcftools query -f '%CHROM\t%POS[\t%GT]\n' >> "${genotype_table}"
 
 # zip and index output (facilitate IGV loading)
 # save annotated vcf for additional clustering scripts
