@@ -181,8 +181,8 @@ p <- ggplot(genome_depth) +
 
 ## ---------------------------
 # save plot as jpg. Height to width ratio is eyeballed for now
-ggsave(sprintf("%s%s_%s_%s_%sbp.jpg", save_dir, Sys.Date(), sample_id, ref, window),
-       p, width = 18, height = 1.7, units = "in")
+ggsave(sprintf("%s%s_%s_%s_%sbp.png", save_dir, Sys.Date(), sample_id, ref, window),
+       p, width = 18, height = 1.7, units = "in", device = png, dpi = 300, bg = "white")
 
 ## ---------------------------
 # Save dataframes as excel
@@ -200,7 +200,8 @@ allele_freq_histo <-   ggplot(genome_snp) +
   geom_histogram(aes(allele_2), bins = 200) +
   facet_wrap(~as.factor(chr), ncol=8, labeller = as_labeller(chr_ids)) +
   xlab("Allele frequency") +
-  ylab(sample_id)
+  ylab(sample_id) +
+  theme_classic()
 
-ggsave(sprintf("%s%s_%s_%s_allele_freq.jpg", save_dir, Sys.Date(), sample_id, ref),
-       allele_freq_histo, width = 18, height = 1.7, units = "in")
+ggsave(sprintf("%s%s_%s_%s_allele_freq.png", save_dir, Sys.Date(), sample_id, ref),
+       allele_freq_histo, width = 18, height = 1.7, units = "in", device = png, dpi=300, bg = "white")
