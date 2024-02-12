@@ -41,13 +41,7 @@ function finish {
   rm bam/"${strain}"_bbmap.sam
 }
 
-# Check for/create output directories
-arr=("${tempdir}trimmed_fastq" "logs" "bam")
-for d in "${arr[@]}"; do
-  if [ ! -d "$d" ]; then
-    mkdir -p "$d"
-  fi
-done
+mkdir -p "${tempdir}trimmed_fastq" "logs" "bam"
 
 # JGI BBTools data preprocessing guidelines:
 ## trim adapters

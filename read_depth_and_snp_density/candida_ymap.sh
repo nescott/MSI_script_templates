@@ -30,13 +30,7 @@ function finish {
 }
 trap finish EXIT
 
-# Check for/create output directories
-arr=("alleles" "depth" "plots")
-for d in "${arr[@]}"; do
-    if [ ! -d "$d" ]; then
-        mkdir -p "$d"
-    fi
-done
+mkdir -p alleles depth plots
 
 # depth and allele counts per bam file from samtools
 

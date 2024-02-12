@@ -27,6 +27,8 @@ bam_list=bam.files
 species=   # no spaces
 ref=  # abbreviation for reference genome
 
+mkdir -p chr_vcf
+
 chr=$(awk -v val="$line" 'NR == val { print $0}' $region_list)
 
 #Load modules

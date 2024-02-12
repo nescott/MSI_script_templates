@@ -23,10 +23,7 @@ snpeff_config=/home/selmecki/shared/software/snpEff/snpEff.config #path to snpef
 snpeff_db=  #name of built database (no path needed)
 snpSift=/home/selmecki/shared/software/snpEff/SnpSift.jar
 
-# Check for/create output directories
-if [ ! -d "annotate" ]; then
-  mkdir "annotate"
-fi
+mkdir -p "annotate"
 
 #Load modules
 module load htslib/1.9

@@ -25,12 +25,7 @@ bam_file=calbicans.bam # text file listing bams with paths
 mtdna= # contig/scaffold ID for removal so mean correction is only of nuclear genome
 
 # output dirs
-arr=("mosdepth_txt" "mosdepth_bed" "tab")
-for d in "${arr[@]}"; do
-  if [ ! -d "$d" ]; then
-    mkdir "$d"
-  fi
-done
+mkdir -p "mosdepth_txt" "mosdepth_bed" "tab"
 
 # calculate uncorrected nuclear mean and perform mean-correction,
 # generate tab-delimited table for graphing,

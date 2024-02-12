@@ -17,13 +17,7 @@ reference_fasta=
 species=
 ref=
 
-# make output for genotyped and filtered vcfs
-arr=("$PWD/genotyped_vcf" "$PWD/filtered_vcf")
-for d in "${arr[@]}"; do
-  if [ ! -d "$d" ]; then
-    mkdir "$d"
-  fi
-done
+mkdir -p "$PWD/genotyped_vcf" "$PWD/filtered_vcf"
 
 # Load modules
 module load gatk
@@ -78,5 +72,3 @@ bgzip filtered_vcf/"${species}"_"${ref}"_indels_filtered.vcf
 bcftools concat -a -o "${species}"_"${ref}"_merged_filtered.vcf
 bgzip "${species}"_"${ref}"_merged_filtered.vcf
 bcftools index -t "${species}"_"${ref}"_merged_filtered.vcf.gz
-
-
