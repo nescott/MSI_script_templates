@@ -42,27 +42,25 @@ library(readxl)
 window <- 5000 # size of window used for rolling mean and snp density
 ploidy <- 2
 
-# Plotting variables
-# manual x-axis labels overwrite input scaffold names in final plot
-chr_ids <- scan(label_file, what = character())
-
 y_axis_labels <- c(1,2,3,4)  # manual y-axis labels, adjust as needed
-
 inter_chr_spacing <- 150000 # size of space between chrs
+
+save_dir <- "plots/" # path with trailing slash, or "" to save locally 
+ref <- "sc5314" # short label for file name or "" to leave out
+
+# Plotting variables
+# X-axis labels overwrite input scaffold names in final plot
+chr_ids <- scan(label_file, what = character())
 
 snp_low <- "white"  # snp LOH colors, plot function uses 2-color gradient scale
 snp_high <- "black"  # snp LOH colors, plot function uses 2-color gradient scale
-cnv_color <- "steelblue4"  # copy number color
+cnv_color <- "dodgerblue4"  # copy number color
     
-ploidy_multiplier <- 2  # this number multiplied by ploidy sets the max-y scale
+ploidy_multiplier <- 2  # this multiplied by ploidy sets the max-y scale
 
 chrom_outline_color <- "gray15"  # color of chromosome outlines
     
 chrom_line_width <- 0.2  # line width of chromosome outlines
-
-# Output variables
-save_dir <- "plots/" # path with trailing slash, or just "" to save where you are
-ref <- "sc5314" # short label for generating file name or "" to leave out
 
 ## ---------------------------
 # Base R doesn't have a mode calculation
@@ -181,8 +179,11 @@ p <- ggplot(genome_depth) +
   geom_rect(data=chroms, aes(group=index, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax),
             linewidth = chrom_line_width, fill = NA, 
             colour = chrom_outline_color, linejoin = "round", inherit.aes = FALSE) +
-    geom_point(data = features, size = 3, color="grey26",
-               aes(group=index, x=plot_start, y=ymin, shape = Feature)) +
+  geom_point(data = features, size = 2,
+               aes(group=index, x=plot_start, y=ymin, shape = Feature, fill = Feature),
+               position = position_nudge(y=0.07)) +
+  scale_fill_manual(values = c("white", "grey26", "deepskyblue")) +
+  scale_shape_manual(values = c(24,21,22)) +
   ylab(sample_id) +
   scale_x_continuous(name = NULL, expand = c(0, 0), breaks = ticks, labels=ca_test) +
   scale_y_continuous(limits = c(0, ploidy*ploidy_multiplier), breaks = y_axis_labels) +
