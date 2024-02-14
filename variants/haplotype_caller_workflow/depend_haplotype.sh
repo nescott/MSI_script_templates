@@ -4,8 +4,8 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=scot0854@umn.edu
-#SBATCH --time=20 
-#SBATCH -p amdsmall,amdlarge,amd512,amd2tb
+#SBATCH --time=20
+#SBATCH -p msismall,msibigmem
 #SBATCH -o %x_%u_%j.out
 #SBATCH -e %x_%u_%j.err
 

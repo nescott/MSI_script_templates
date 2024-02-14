@@ -19,17 +19,11 @@ set -o pipefail
 
 ref_fasta=
 sample_file=
-line=${SLURM_ARRAY_TASK_ID} 
+line=${SLURM_ARRAY_TASK_ID}
 
-# Check for/create output directories
-arr=("$PWD/vcf" "$PWD/logs" "$PWD/bam")
-for d in "${arr[@]}"; do
-  if [ ! -d "$d" ]; then
-    mkdir "$d"
-  fi
-done
+mkdir -p "$PWD/vcf" "$PWD/logs" "$PWD/bam"
 
-#Load GATK module 
+#Load GATK module
 module load gatk/4.1.2
 
 #Get strain ID froms sample file line equal to array task ID
@@ -38,7 +32,6 @@ strain=$(awk -v val="${line}" 'NR == val { print $1}' "${sample_file}")
 #variant calling and filtering, with normal sample
 gatk Mutect2 -R "${ref_fasta}" -I bam/"${strain}"_trimmed_bwa_sorted_markdup.bam \
 -O vcf/"${strain}"_unfiltered.vcf
-  
+
 gatk FilterMutectCalls -R "$ref_fasta" -V vcf/"${strain}"_unfiltered.vcf \
 -O vcf/"${strain}"_filtered.vcf
-  

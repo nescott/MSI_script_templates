@@ -15,12 +15,8 @@ set -o pipefail
 species=
 ref=
 
-# Check for/create dir for db files
-if [ ! -d "db" ]; then
-  mkdir db
-fi
+mkdir -p db
 
-# Load modules
 module load gatk
 
 gatk --java-options "-Xmx6g" GenomicsDBImport \

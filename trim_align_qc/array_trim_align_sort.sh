@@ -22,13 +22,7 @@ instrument=
 ref_fasta=  #include path; indices should be same directory
 line=${SLURM_ARRAY_TASK_ID}
 
-# Check for/create output directories
-arr=("$PWD/trimmed_fastq" "$PWD/logs" "$PWD/bam")
-for d in "${arr[@]}"; do
-  if [ ! -d "$d" ]; then
-    mkdir "$d"
-  fi
-done
+mkdir -p "$PWD/trimmed_fastq" "$PWD/logs" "$PWD/bam"
 
 # Load modules for trimming and aligning
 module load trimmomatic/0.39

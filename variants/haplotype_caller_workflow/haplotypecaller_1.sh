@@ -23,10 +23,7 @@ bam_dir=
 # Get strain ID froms sample file line equal to array task ID
 strain=$(awk -v val="${line}" 'NR == val { print $1}' "${sample_file}")
 
-# Check for/create output dir
-if [ ! -d "gvcf" ]; then
-  mkdir gvcf
-fi
+mkdir -p gvcf
 
 # Get bam file from strain and path
 bam="${bam_dir}""${strain}"_trimmed_bwa_sorted_markdup.bam

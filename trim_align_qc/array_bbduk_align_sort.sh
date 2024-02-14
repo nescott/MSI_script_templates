@@ -39,12 +39,7 @@ module load bwa/0.7.17
 module load samtools/1.10
 
 # Check for/create output directories
-arr=("${tempdir}trimmed_fastq" "logs" "bam")
-for d in "${arr[@]}"; do
-  if [ ! -d "$d" ]; then
-    mkdir -p "$d"
-  fi
-done
+mkdir -p "${tempdir}trimmed_fastq" "logs" "bam"
 
 # JGI BBTools data preprocessing guidelines:
 ## trim adapters
