@@ -181,17 +181,17 @@ p <- ggplot(genome_depth) +
             colour = chrom_outline_color, linejoin = "round", inherit.aes = FALSE) +
   geom_point(data = features, size = 2,
                aes(group=index, x=plot_start, y=ymin, shape = Feature, fill = Feature),
-               position = position_nudge(y=0.07)) +
+               position = position_nudge(y=0.065)) +
   scale_fill_manual(values = c("white", "grey26", "deepskyblue")) +
   scale_shape_manual(values = c(24,21,22)) +
   ylab(sample_id) +
-  scale_x_continuous(name = NULL, expand = c(0, 0), breaks = ticks, labels=ca_test) +
+  scale_x_continuous(name = NULL, expand = c(0, 0), breaks = ticks, labels=chr_ids) +
   scale_y_continuous(limits = c(0, ploidy*ploidy_multiplier), breaks = y_axis_labels) +
   theme_classic() +
   theme(plot.title = element_text(size = 12, hjust = 0.5),
         axis.ticks = element_line(color = NA),
         axis.line = element_blank(),
-        axis.text.y = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
         axis.text.x = element_text(size=12))
 
 ## ---------------------------
