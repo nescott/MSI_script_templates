@@ -1,14 +1,13 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=3gb
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=scot0854@umn.edu
 #SBATCH --time=3:00:00
 #SBATCH -p amdlarge,large
-#SBATCH -o job_out/%x_%u_%A_%a.out
-#SBATCH -e job_out/%x_%u_%A_%a.err
+#SBATCH -o %A_%a.out
+#SBATCH -e %A_%a.err
 #SBATCH --array=1-
 
 #Perform variant calling on sorted, markduped bams using Mutect2

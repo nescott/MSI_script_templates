@@ -1,14 +1,13 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=10gb
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=scot0854@umn.edu
 #SBATCH --time=1:00:00
 #SBATCH -p msismall,msilarge
-#SBATCH -o %x_%u_%j.out
-#SBATCH -e %x_%u_%j.err
+#SBATCH -o %x_%j.out
+#SBATCH -e %x_%j.err
 #SBATCH --array=1
 set -ue
 set -o pipefail
